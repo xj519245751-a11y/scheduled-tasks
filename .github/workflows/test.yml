@@ -1,9 +1,10 @@
-name: Test Setup
+name: OKX MACD 扫描
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 1 * * *' # 每天 UTC 时间 1 点（北京时间早上 9 点）自动运行
+    # 每天北京时间 0点、6点、12点、18点 自动运行 (对应 UTC 时间 16, 22, 4, 10 点)
+    - cron: '0 16,22,4,10 * * *'
 
 jobs:
   test:
@@ -22,10 +23,7 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      # 最关键的一步：真正运行你的 main.py
       - name: Run Python Script
         env:
           SERVERCHAN_KEY: ${{ secrets.SERVERCHAN_KEY }}
-          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
-          WXPUSHER_SPT: ${{ secrets.WXPUSHER_SPT }}
         run: python main.py
