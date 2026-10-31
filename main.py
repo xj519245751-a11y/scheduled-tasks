@@ -2,16 +2,14 @@ import os
 import requests
 
 def main():
-    # 读取你刚才存的 SPT
-    spt = os.environ.get("WXPUSHER_SPT")
-    url = "https://wxpusher.zjiecode.com/api/send/message/simple-push"
+    key = os.environ.get("SERVERCHAN_KEY")
+    # Server酱的推送接口
+    url = f"https://sctapi.ftqq.com/{key}.send"
     data = {
-        "content": "恭喜！你的 GitHub Actions 已经成功跑通了！这次是真免费的了！",
-        "summary": "GitHub测试消息",
-        "contentType": 1,
-        "spt": spt
+        "title": "GitHub测试消息",
+        "desp": "恭喜！GitHub Actions 已经成功跑通了！这次换成了 Server酱。"
     }
-    response = requests.post(url, json=data)
+    response = requests.post(url, data=data)
     print("返回结果:", response.text)
 
 if __name__ == "__main__":
