@@ -1,1 +1,28 @@
+name: 第二个脚本-WxPusher
 
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 4 * * *' # 每天 UTC 4点 (北京时间中午 12点) 运行
+
+jobs:
+  run-script2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run Python Script 2
+        env:
+          WXPUSHER_SPT: ${{ secrets.WXPUSHER_SPT }}
+        run: python main2.py
