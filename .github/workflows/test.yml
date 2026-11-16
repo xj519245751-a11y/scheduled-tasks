@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   schedule:
     # 每天北京时间 0点、6点、12点、18点 自动运行 (对应 UTC 时间 16, 22, 4, 10 点)
-    - cron: '0 16,22,4,10 * * *'
+    - cron: '17 16,22,4,10 * * *'
 
 jobs:
   test:
