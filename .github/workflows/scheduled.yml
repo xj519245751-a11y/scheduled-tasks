@@ -44,4 +44,10 @@ jobs:
           MY_EMAIL: ${{ secrets.MY_EMAIL }}
           MY_PASSWORD: ${{ secrets.MY_PASSWORD }}
           SERVERCHAN_KEY: ${{ secrets.SERVERCHAN_KEY }}
-        run: python main.py
+        run: |
+          if [ -n "$SERVERCHAN_KEY" ]; then
+           echo "SERVERCHAN_KEY 已设置"
+          else
+          echo "SERVERCHAN_KEY 为空"
+          fi
+          python main.py
