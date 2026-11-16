@@ -9,6 +9,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -27,3 +29,11 @@ jobs:
         env:
           SERVERCHAN_KEY: ${{ secrets.SERVERCHAN_KEY }}
         run: python main.py
+      - name: Keep alive
+        run: |
+          date -u > last_run.txt
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add last_run.txt
+          git commit -m "keep alive" || true
+          git push
