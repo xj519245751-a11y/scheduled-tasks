@@ -1,0 +1,32 @@
+name: MACD V3 Upgrade Tests
+
+on:
+  push:
+    branches:
+      - feature/macd-v3-upgrade
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Compile Python files
+        run: python -m py_compile mmain.py test_macd_logic.py
+      - name: Run unit tests
+        run: python -m unittest -v test_macd_logic.py
