@@ -13,13 +13,16 @@ V4_ARTIFACT_NAME = "okx-quant-v4-reports"
 BEIJING = ZoneInfo("Asia/Shanghai")
 API = "https://api.github.com"
 S = requests.Session()
+PUBLIC = requests.Session()
+PUBLIC.headers.update({"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","User-Agent":"daily-v2-v4-common-coins"})
 S.headers.update({"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28","User-Agent":"daily-v2-v4-common-coins"})
 TOKEN = os.environ.get("GITHUB_TOKEN","").strip()
 if TOKEN:
     S.headers["Authorization"] = f"Bearer {TOKEN}"
 
-def api_json(url, params=None):
-    r = S.get(url, params=params, timeout=45)
+def api_json(url, params=None, public=False):
+    client = PUBLIC if public else S
+    r = client.get(url, params=params, timeout=45)
     r.raise_for_status()
     return r.json()
 
@@ -33,7 +36,7 @@ def zulu(dt):
 
 def list_runs(repo, workflow, start, end):
     url = f"{API}/repos/{repo}/actions/workflows/{workflow}/runs"
-    data = api_json(url, {"per_page":100,"created":f"{zulu(start)}..{zulu(end-timedelta(seconds=1))}"})
+    data = api_json(url, {"per_page":100,"created":f"{zulu(start)}..{zulu(end-timedelta(seconds=1))}"}, public=(repo == V4_REPO))
     return data.get("workflow_runs",[])
 
 def get_v2_signals(start,end):
@@ -83,11 +86,11 @@ def latest_v4_report(start,end):
     runs = list_runs(V4_REPO,V4_WORKFLOW,start,end)
     runs = sorted([r for r in runs if r.get("status")=="completed" and r.get("conclusion")=="success"],key=lambda r:r.get("created_at",""),reverse=True)
     for run in runs:
-        artifacts = api_json(run["artifacts_url"]).get("artifacts",[])
+        artifacts = api_json(run["artifacts_url"], public=True).get("artifacts",[])
         artifact = next((a for a in artifacts if a.get("name")==V4_ARTIFACT_NAME and not a.get("expired")),None)
         if not artifact:
             continue
-        response = S.get(artifact["archive_download_url"],timeout=90)
+        response = PUBLIC.get(artifact["archive_download_url"],timeout=90)
         response.raise_for_status()
         try:
             archive = zipfile.ZipFile(io.BytesIO(response.content))
