@@ -64,8 +64,8 @@ def get_v2_signals(start,end):
                 text = archive.read(name).decode("utf-8",errors="replace")
                 for line in text.splitlines():
                     # Only final qualified report lines, not "检查/未达标" progress.
-                    flip = re.search(r"-\\s+\\*\\*([A-Z0-9]{2,})\\*\\*\\s+[红绿]\\d+根后转([红绿]).*?（(转多|转空)",line)
-                    streak = re.search(r"-\\s+\\*\\*([A-Z0-9]{2,})\\*\\*\\s+([红绿])(\\d+)根(?:｜|$)",line)
+                    flip = re.search(r"-\s+\*\*([A-Z0-9]{2,})\*\*\s+[红绿]\d+根后转([红绿]).*?（(转多|转空)",line)
+                    streak = re.search(r"-\s+\*\*([A-Z0-9]{2,})\*\*\s+([红绿])(\d+)根(?:｜|$)",line)
                     if flip:
                         symbol, color, direction = flip.group(1), flip.group(2), flip.group(3)
                         detail = f"转为{color}柱（{direction}）"
