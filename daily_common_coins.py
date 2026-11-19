@@ -64,17 +64,17 @@ def get_v2_signals(start,end):
                 text = archive.read(name).decode("utf-8",errors="replace")
                 for line in text.splitlines():
                     # Only final qualified report lines, not "检查/未达标" progress.
-                    m = re.search(r"-\s+\*\*([A-Z0-9]{2,})\*\*\s+(?:([红绿])(\d+)根|([红绿])(\d+)根后转([红绿]).*?（(转多|转空)",line)
-                    if not m:
-                        continue
-                    symbol = m.group(1)
-                    if m.group(6):
-                        color, direction = m.group(6), m.group(7)
+                    flip = re.search(r"-\\s+\\*\\*([A-Z0-9]{2,})\\*\\*\\s+[红绿]\\d+根后转([红绿]).*?（(转多|转空)",line)
+                    streak = re.search(r"-\\s+\\*\\*([A-Z0-9]{2,})\\*\\*\\s+([红绿])(\\d+)根(?:｜|$)",line)
+                    if flip:
+                        symbol, color, direction = flip.group(1), flip.group(2), flip.group(3)
                         detail = f"转为{color}柱（{direction}）"
-                    else:
-                        color, count = m.group(2), m.group(3)
+                    elif streak:
+                        symbol, color, count = streak.group(1), streak.group(2), streak.group(3)
                         direction = "偏多形态" if color=="红" else "偏空形态"
                         detail = f"连续{count}根{color}柱（{direction}）"
+                    else:
+                        continue
                     item = found.setdefault(symbol,{"symbol":symbol,"details":[],"runs":[]})
                     if detail not in item["details"]:
                         item["details"].append(detail)
